@@ -587,6 +587,7 @@ static void ozone_set_layout(ozone_handle_t *ozone, bool is_threaded)
       return;
 
    scale_factor = ozone->last_scale_factor;
+   scale_factor = 0.4;
 
    /* Calculate dimensions */
    ozone->dimensions.header_height = HEADER_HEIGHT * scale_factor;

@@ -273,6 +273,8 @@ static bool oga_gfx_frame(void *data, const void *frame, unsigned width,
 
    /* copy buffer to surface */
    dst        = (uint8_t*)go2_surface_map(dst_surface);
+   if (unlikely(!dst))
+       return true;
    yy         = height;
    stride     = width * bpp;
    dst_stride = go2_surface_stride_get(dst_surface);
