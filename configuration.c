@@ -210,6 +210,8 @@ enum bluetooth_driver_enum
 enum wifi_driver_enum
 {
    WIFI_CONNMANCTL          = BLUETOOTH_NULL + 1,
+   WIFI_NMCLI,
+   WIFI_NETCFG,
    WIFI_NULL
 };
 
@@ -512,6 +514,8 @@ static const enum bluetooth_driver_enum BLUETOOTH_DEFAULT_DRIVER = BLUETOOTH_NUL
 
 #if defined(HAVE_LAKKA)
 static const enum wifi_driver_enum WIFI_DEFAULT_DRIVER = WIFI_CONNMANCTL;
+#elif defined(HAVE_WIFI)
+static const enum wifi_driver_enum WIFI_DEFAULT_DRIVER = WIFI_NETCFG;
 #else
 static const enum wifi_driver_enum WIFI_DEFAULT_DRIVER = WIFI_NULL;
 #endif
@@ -1076,6 +1080,10 @@ const char *config_get_default_wifi(void)
    {
       case WIFI_CONNMANCTL:
          return "connmanctl";
+      case WIFI_NMCLI:
+         return "nmcli";
+      case WIFI_NETCFG:
+         return "netcfg";
       case WIFI_NULL:
          break;
    }

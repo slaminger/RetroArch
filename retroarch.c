@@ -961,6 +961,10 @@ static const wifi_driver_t *wifi_drivers[] = {
 #ifdef HAVE_LAKKA
    &wifi_connmanctl,
 #endif
+#ifdef HAVE_WIFI
+   &wifi_nmcli,
+   &wifi_netcfg,
+#endif
    &wifi_null,
    NULL,
 };
@@ -10956,7 +10960,7 @@ struct string_list *string_list_new_special(enum string_list_type type,
          break;
 #endif
       case STRING_LIST_WIFI_DRIVERS:
-#ifdef HAVE_WIFI
+#if defined(HAVE_WIFI) || defined(HAVE_ODROIDGO2)
          for (i = 0; wifi_drivers[i]; i++)
          {
             const char *opt  = wifi_drivers[i]->ident;
