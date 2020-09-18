@@ -595,9 +595,12 @@ static bool oga_gfx_frame(void *data, const void *frame, unsigned width,
    {
       menu_driver_frame(true, video_info);
 
+      width = vid->menu_surface->width;
+      height = vid->menu_surface->height;
+
       oga_rect_t r;
       oga_calc_bounds(&r, width, height, aspect_ratio);
-      oga_blit(vid->menu_surface, 0, 0, vid->menu_surface->width, vid->menu_surface->height,
+      oga_blit(vid->menu_surface, 0, 0, width, height,
             page_surface, r.y, r.x, r.h, r.w, HAL_TRANSFORM_ROT_270, vid->scale_mode, 0);
    }
 #endif
@@ -635,8 +638,8 @@ static void oga_gfx_set_texture_frame(void *data, const void *frame, bool rgb32,
 
    if (vid->menu_surface->width != width || vid->menu_surface->height != height)
    {
-      RARCH_LOG("oga_set_texture_frame rgb32 %d width %hu height %hu alpha %f\n",
-            rgb32, width, height, alpha);
+//      RARCH_LOG("oga_set_texture_frame rgb32 %d width %hu height %hu alpha %f\n",
+//            rgb32, width, height, alpha);
 
       oga_destroy_surface(vid->menu_surface);
       vid->menu_surface = oga_create_surface(vid->fd, width, height, RK_FORMAT_BGRA_8888);
