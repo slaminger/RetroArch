@@ -20398,6 +20398,7 @@ static bool rarch_environment_cb(unsigned cmd, void *data)
 
       case RETRO_ENVIRONMENT_GET_CURRENT_SOFTWARE_FRAMEBUFFER:
       {
+         printf("XXX RETRO_ENVIRONMENT_GET_CURRENT_SOFTWARE_FRAMEBUFFER\n");
          struct retro_framebuffer *fb = (struct retro_framebuffer*)data;
          if (
                   p_rarch->video_driver_poke
