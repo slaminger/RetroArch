@@ -590,12 +590,12 @@ static bool oga_gfx_frame(void *data, const void *frame, unsigned width,
 
    if (likely(!video_info->menu_is_alive))
    {
+      unsigned int blend = video_info->runloop_is_paused ? 0x800105 : 0;
       if (!vid->sw_fb)
       {
          uint8_t* src = (uint8_t*)frame;
          uint8_t* dst = (uint8_t*)vid->frame_surface->map;
          int dst_pitch = vid->frame_surface->pitch;
-         unsigned int blend = video_info->runloop_is_paused ? 0x800105 : 0;
 
          int yy = height;
          while (yy > 0) {
