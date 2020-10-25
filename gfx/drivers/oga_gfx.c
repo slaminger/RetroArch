@@ -30,6 +30,7 @@
 #include "frontend/frontend_driver.h"
 
 #include "../font_driver.h"
+#include "../../libretro.h"
 
 #ifdef HAVE_CONFIG_H
 #include "../../config.h"
@@ -95,6 +96,7 @@ typedef struct oga_video
    int scale_mode;
    int rotation;
    bool threaded;
+   bool sw_fb;
 
    oga_surface_t* msg_surface;
    const font_renderer_driver_t *font_driver;
@@ -388,6 +390,7 @@ static void *oga_gfx_init(const video_info_t *video,
 
    vid->menu_surface = oga_create_surface(vid->fd, NATIVE_WIDTH, NATIVE_HEIGHT, RK_FORMAT_BGRA_8888);
    vid->threaded = video->is_threaded;
+   vid->sw_fb = false;
 
    /*
     * From RGA2 documentation:
@@ -587,17 +590,20 @@ static bool oga_gfx_frame(void *data, const void *frame, unsigned width,
 
    if (likely(!video_info->menu_is_alive))
    {
-      uint8_t* src = (uint8_t*)frame;
-      uint8_t* dst = (uint8_t*)vid->frame_surface->map;
-      int dst_pitch = vid->frame_surface->pitch;
-      unsigned int blend = video_info->runloop_is_paused ? 0x800105 : 0;
+      if (!vid->sw_fb)
+      {
+         uint8_t* src = (uint8_t*)frame;
+         uint8_t* dst = (uint8_t*)vid->frame_surface->map;
+         int dst_pitch = vid->frame_surface->pitch;
+         unsigned int blend = video_info->runloop_is_paused ? 0x800105 : 0;
 
-      int yy = height;
-      while (yy > 0) {
-          memcpy(dst, src, pitch);
-          src += pitch;
-          dst += dst_pitch;
-          --yy;
+         int yy = height;
+         while (yy > 0) {
+            memcpy(dst, src, pitch);
+            src += pitch;
+            dst += dst_pitch;
+            --yy;
+         }
       }
 
       oga_rect_t r;
@@ -718,7 +724,7 @@ static bool oga_gfx_set_shader(void *data, enum rarch_shader_type type, const ch
    return false;
 }
 
-void oga_set_rotation(void *data, unsigned rotation)
+static void oga_set_rotation(void *data, unsigned rotation)
 {
    oga_video_t *vid = (oga_video_t*)data;
    if (!vid)
@@ -744,6 +750,25 @@ void oga_set_rotation(void *data, unsigned rotation)
    }
 }
 
+static bool oga_get_current_software_framebuffer(void *data,
+        struct retro_framebuffer *framebuffer)
+{
+    oga_video_t *vid = (oga_video_t*)data;
+
+    printf("XXX oga_get_current_software_framebuffer\n");
+
+    framebuffer->data = (void*)vid->frame_surface->map;
+    framebuffer->width = vid->frame_surface->width;
+    framebuffer->height = vid->frame_surface->height;
+    framebuffer->pitch = vid->frame_surface->pitch;
+    framebuffer->format = RETRO_PIXEL_FORMAT_RGB565;
+    framebuffer->memory_flags |= RETRO_MEMORY_TYPE_CACHED;
+
+    vid->sw_fb = true;
+
+    return true;
+}
+
 static const video_poke_interface_t oga_poke_interface = {
    NULL,
    NULL,
@@ -764,7 +789,7 @@ static const video_poke_interface_t oga_poke_interface = {
    NULL,
    NULL,
    NULL,
-   NULL,
+   oga_get_current_software_framebuffer,
    NULL
 };
 
