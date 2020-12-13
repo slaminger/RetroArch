@@ -568,7 +568,7 @@ static bool video_thread_frame(void *data, const void *frame_,
     * still working on last frame. */
    if (!thr->frame.updated)
    {
-      if (src)
+      if (src && src != dst)
       {
          unsigned h;
          for (h = 0; h < height; h++, src += pitch, dst += copy_stride)
@@ -1109,6 +1109,20 @@ static uint32_t thread_get_flags(void *data)
    return thr->poke->get_flags(thr->driver_data);
 }
 
+static bool thread_get_current_software_framebuffer(void *data,
+      struct retro_framebuffer *framebuffer)
+{
+   thread_video_t *thr = (thread_video_t*)data;
+   if (!thr)
+      return false;
+
+   framebuffer->data = (uint8_t*)thr->frame.buffer;
+   framebuffer->pitch = thr->frame.pitch;
+   framebuffer->format = thr->info.rgb32 ? RETRO_PIXEL_FORMAT_XRGB8888 : RETRO_PIXEL_FORMAT_RGB565;
+
+   return true;
+}
+
 static const video_poke_interface_t thread_poke = {
    thread_get_flags,
    thread_load_texture,
@@ -1131,7 +1145,7 @@ static const video_poke_interface_t thread_poke = {
    thread_grab_mouse_toggle,
 
    thread_get_current_shader,
-   NULL,                      /* get_current_software_framebuffer */
+   thread_get_current_software_framebuffer,
    NULL                       /* get_hw_render_interface */
 };
 
