@@ -27640,6 +27640,16 @@ static void audio_driver_flush(
          (audio_fastforward_mute && is_fastmotion)) ?
                0.0f : p_rarch->audio_driver_volume_gain;
 
+   if (!p_rarch->audio_driver_use_float) {
+      if (audio_volume_gain != 0.0) {
+         if (p_rarch->current_audio->write(
+                  p_rarch->audio_driver_context_audio_data,
+                  data, samples * 6) < 0)
+            p_rarch->audio_driver_active = false;
+      }
+      return;
+   }
+
    src_data.data_out                 = NULL;
    src_data.output_frames            = 0;
 
@@ -37388,6 +37398,7 @@ int runloop_iterate(void)
    }
 #endif
 
+#if 0
    if (p_rarch->runloop_frame_time.callback)
    {
       /* Updates frame timing if frame timing callback is in use by the core.
@@ -37416,7 +37427,9 @@ int runloop_iterate(void)
 
       p_rarch->runloop_frame_time.callback(delta);
    }
+#endif
 
+#if 0
    /* Update audio buffer occupancy if buffer status
     * callback is in use by the core */
    if (p_rarch->runloop_audio_buffer_status.callback)
@@ -37455,7 +37468,9 @@ int runloop_iterate(void)
       p_rarch->runloop_audio_buffer_status.callback(
             audio_buf_active, audio_buf_occupancy, audio_buf_underrun);
    }
+#endif
 
+#if 1
    switch ((enum runloop_state)runloop_check_state(p_rarch,
             settings, current_time))
    {
@@ -37493,6 +37508,7 @@ int runloop_iterate(void)
          p_rarch->runloop_core_running = true;
          break;
    }
+#endif
 
 #ifdef HAVE_THREADS
    if (p_rarch->runloop_autosave)
@@ -37506,6 +37522,7 @@ int runloop_iterate(void)
          = intfstream_tell(p_rarch->bsv_movie_state_handle->file);
 #endif
 
+#if 0
    if (  p_rarch->camera_cb.caps &&
          p_rarch->camera_driver  &&
          p_rarch->camera_driver->poll &&
@@ -37513,7 +37530,9 @@ int runloop_iterate(void)
       p_rarch->camera_driver->poll(p_rarch->camera_data,
             p_rarch->camera_cb.frame_raw_framebuffer,
             p_rarch->camera_cb.frame_opengl_texture);
+#endif
 
+#if 0
    /* Update binds for analog dpad modes. */
    for (i = 0; i < max_users; i++)
    {
@@ -37562,9 +37581,14 @@ int runloop_iterate(void)
          }
       }
    }
+#endif
 
-   if ((video_frame_delay > 0) && !p_rarch->input_driver_nonblock_state)
+#if 0
+   if (1 || (video_frame_delay > 0) && !p_rarch->input_driver_nonblock_state)
+#endif
+#if 0
       retro_sleep(video_frame_delay);
+#endif
 
    {
 #ifdef HAVE_RUNAHEAD
@@ -37585,10 +37609,12 @@ int runloop_iterate(void)
          core_run();
    }
 
+#if 0
    /* Increment runtime tick counter after each call to
     * core_run() or run_ahead() */
    p_rarch->libretro_core_runtime_usec += rarch_core_runtime_tick(
          p_rarch, current_time);
+#endif
 
 #ifdef HAVE_CHEEVOS
    if (settings->bools.cheevos_enable)
@@ -37602,6 +37628,7 @@ int runloop_iterate(void)
       discord_update(DISCORD_PRESENCE_GAME);
 #endif
 
+#if 0
    for (i = 0; i < max_users; i++)
    {
       unsigned j;
@@ -37621,6 +37648,7 @@ int runloop_iterate(void)
          }
       }
    }
+#endif
 
 #ifdef HAVE_BSV_MOVIE
    if (p_rarch->bsv_movie_state_handle)
@@ -37645,7 +37673,7 @@ int runloop_iterate(void)
       return 0;
 
 end:
-   if (vrr_runloop_enable)
+   if (0 && vrr_runloop_enable)
    {
       struct retro_system_av_info *av_info = &p_rarch->video_driver_av_info;
       bool audio_sync                      = settings->bools.audio_sync;
